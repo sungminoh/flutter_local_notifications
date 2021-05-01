@@ -151,6 +151,31 @@ class AndroidFlutterLocalNotificationsPlugin
                 }));
   }
 
+  Future<void> periodicallyShowAt(
+      int id,
+      String? title,
+      String? body,
+      TZDateTime scheduledDate,
+      RepeatInterval repeatInterval, {
+        AndroidNotificationDetails? notificationDetails,
+        String? payload,
+        bool androidAllowWhileIdle = false,
+      }) async {
+    validateId(id);
+    final Map<String, Object?> serializedPlatformSpecifics =
+        notificationDetails?.toMap() ?? <String, Object>{};
+    serializedPlatformSpecifics['allowWhileIdle'] = androidAllowWhileIdle;
+    await _channel.invokeMethod('periodicallyShow', <String, Object?>{
+      'id': id,
+      'title': title,
+      'body': body,
+      'calledAt': scheduledDate.millisecondsSinceEpoch,
+      'repeatInterval': repeatInterval.index,
+      'platformSpecifics': serializedPlatformSpecifics,
+      'payload': payload ?? '',
+    });
+  }
+
   /// Shows a notification on a daily interval at the specified time.
   @Deprecated(
       'Deprecated due to problems with time zones. Use zonedSchedule instead.')
@@ -487,6 +512,28 @@ class IOSFlutterLocalNotificationsPlugin
                 }));
   }
 
+  Future<void> periodicallyShowAt(
+      int id,
+      String? title,
+      String? body,
+      TZDateTime scheduledDate,
+      RepeatInterval repeatInterval, {
+        IOSNotificationDetails? notificationDetails,
+        String? payload,
+      }) async {
+    validateId(id);
+    await _channel.invokeMethod('periodicallyShow', <String, Object?>{
+      'id': id,
+      'title': title,
+      'body': body,
+      'calledAt': scheduledDate.millisecondsSinceEpoch,
+      'repeatInterval': repeatInterval.index,
+      'platformSpecifics': notificationDetails?.toMap(),
+      'payload': payload ?? ''
+    });
+  }
+
+
   /// Shows a notification on a daily interval at the specified time.
   @Deprecated(
       'Deprecated due to problems with time zones. Use zonedSchedule instead.')
@@ -670,6 +717,27 @@ class MacOSFlutterLocalNotificationsPlugin
               : <String, Object>{
                   'matchDateTimeComponents': matchDateTimeComponents.index
                 }));
+  }
+
+  Future<void> periodicallyShowAt(
+      int id,
+      String? title,
+      String? body,
+      TZDateTime scheduledDate,
+      RepeatInterval repeatInterval, {
+        MacOSNotificationDetails? notificationDetails,
+        String? payload,
+      }) async {
+    validateId(id);
+    await _channel.invokeMethod('periodicallyShow', <String, Object?>{
+      'id': id,
+      'title': title,
+      'body': body,
+      'calledAt': scheduledDate.millisecondsSinceEpoch,
+      'repeatInterval': repeatInterval.index,
+      'platformSpecifics': notificationDetails?.toMap(),
+      'payload': payload ?? ''
+    });
   }
 
   @override

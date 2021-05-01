@@ -370,6 +370,36 @@ class FlutterLocalNotificationsPlugin {
     }
   }
 
+  Future<void> periodicallyShowAt(
+      int id,
+      String? title,
+      String? body,
+      TZDateTime scheduledDate,
+      RepeatInterval repeatInterval,
+      NotificationDetails notificationDetails, {
+        String? payload,
+        bool androidAllowWhileIdle = false,
+      }) async {
+    if (_platform.isAndroid) {
+      await resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+          ?.periodicallyShowAt(id, title, body, scheduledDate, repeatInterval,
+          notificationDetails: notificationDetails.android,
+          payload: payload,
+          androidAllowWhileIdle: androidAllowWhileIdle);
+    } else if (_platform.isIOS) {
+      await resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>()
+          ?.periodicallyShowAt(id, title, body, scheduledDate, repeatInterval,
+          notificationDetails: notificationDetails.iOS, payload: payload);
+    } else if (_platform.isMacOS) {
+      await resolvePlatformSpecificImplementation<
+          MacOSFlutterLocalNotificationsPlugin>()
+          ?.periodicallyShowAt(id, title, body, scheduledDate, repeatInterval,
+          notificationDetails: notificationDetails.macOS, payload: payload);
+    }
+  }
+
   /// Shows a notification on a daily interval at the specified time.
   @Deprecated(
       'Deprecated due to problems with time zones. Use zonedSchedule instead '
